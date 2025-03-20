@@ -353,6 +353,12 @@
         .language-switch:hover {
             background-color: #283593;
         }
+
+        .theory-block h4 {
+            color: #1a237e;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -426,6 +432,7 @@
 
         <div class="theory-block">
             <h3>Как это работает?</h3>
+            <h4>Что такое SVD?</h4>
             <p>Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>. С интуицией, стоящей за сингулярным разложением, рекомендую ознакомиться в видео:</p>
             <div class="video-container">
                 <iframe width="100%" height="315" src="https://www.youtube.com/embed/vSczTbgc8Rc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
@@ -462,30 +469,30 @@
                 compressedImage: 'Сжатое изображение',
                 svdMatrices: 'Матрицы SVD разложения',
                 howItWorks: 'Как это работает?',
-                theory: 'Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>. Подробнее об интуиции, стоящей за сингулярным разложением, рекомендую ознакомиться в видео:',
-                imageCompression: 'Сжатие изображения',
-                stepsIntro: 'Процесс сжатия изображения с помощью SVD включает следующие шаги:',
-                steps: [
-                    'Изображение представляется в виде матрицы для каждого цветового канала (R, G, B).',
-                    'Для каждой матрицы вычисляется SVD разложение: A = U × Σ × V<sup>T</sup>',
-                    'Матрица Σ содержит сингулярные значения, упорядоченные по убыванию их значимости.',
-                    'Сжатие достигается путем использования только первых k компонент разложения.',
-                    'Чем больше компонент используется, тем точнее восстановленное изображение.'
+                whatIsSvd: 'Что такое SVD?',
+                svdDefinition: 'Сингулярное разложение (Singular Value Decomposition, SVD) — это метод линейной алгебры, который раскладывает любую матрицу A размером m × n на три компонента:<br>A = U × Σ × V<sup>T</sup><br>где:',
+                svdComponents: [
+                    'U и V — ортогональные матрицы,',
+                    'Σ — диагональная матрица с сингулярными значениями, упорядоченными по убыванию.'
                 ],
-                effectiveFor: 'Этот метод особенно эффективен для изображений с повторяющимися паттернами и плавными переходами цветов.',
-                components: 'компонента',
-                componentsOf: 'из',
-                processingStatus: {
-                    scaling: 'Масштабирование изображения до 200px...',
-                    rgbSplit: 'Разделение изображения на RGB каналы...',
-                    normalization: 'Нормализация данных...',
-                    computing: 'Вычисление компоненты'
-                },
-                errors: {
-                    compression: 'Ошибка при сжатии',
-                    processing: 'Ошибка при обработке изображения',
-                    updating: 'Ошибка при обновлении изображения'
-                },
+                singularValuesExplanation: 'Сингулярные значения (элементы Σ) отражают «важность» информации в данных: чем они больше, тем сильнее влияют на структуру матрицы A.',
+                howToApplySvd: 'Как применить SVD к изображениям?',
+                imageAsMatrix: 'Изображение в оттенках серого можно представить как матрицу, где каждый элемент — яркость пикселя (от 0 до 255). Цветное изображение — это три такие матрицы (для каналов Red, Green, Blue).',
+                compressionIdea: 'Применяя SVD к матрице изображения, мы получаем набор сингулярных значений. <b>Идея сжатия</b>: оставить только k самых крупных сингулярных значений, а остальные отбросить. Это позволяет приближенно восстановить изображение с меньшим объемом данных.',
+                compressionProcess: 'Процесс сжатия',
+                compressionSteps: [
+                    '<b>Разложение</b>: применяем SVD к матрице изображения.',
+                    '<b>Усечение</b>: оставляем первые k сингулярных значений (остальные заменяем нулями).',
+                    '<b>Восстановление</b>: умножаем усеченные матрицы U<sub>k</sub>, Σ<sub>k</sub>, V<sub>k</sub><sup>T</sup>, получая приближенную матрицу A<sub>k</sub> ≈ A.'
+                ],
+                sizeCalculation: '<b>Пример расчета размера</b>:',
+                sizeCalculationSteps: [
+                    'Исходное изображение: m × n пикселей.',
+                    'После сжатия: храним U<sub>k</sub> (m × k), Σ<sub>k</sub> (k × k), V<sub>k</sub><sup>T</sup> (k × n).',
+                    'Новый размер: k(m + n + 1). При k << m, n экономия значительна!'
+                ],
+                qualityCompressionBalance: 'Баланс между качеством и сжатием',
+                balanceExplanation: 'Чем меньше k, тем выше степень сжатия, но ниже качество. На практике k выбирают экспериментально, в зависимости от допустимых потерь. Например, при k = 50 изображение может сохранить 90% информации, но занять в 10 раз меньше места.',
                 authorName: 'Иван Антипов'
             },
             en: {
@@ -497,30 +504,30 @@
                 compressedImage: 'Compressed Image',
                 svdMatrices: 'SVD Decomposition Matrices',
                 howItWorks: 'How It Works?',
-                theory: 'Singular Value Decomposition (SVD) is a matrix factorization method that allows representing an image as a product of three matrices: U, Σ, and V<sup>T</sup>. For more details about the intuition behind singular value decomposition, I recommend watching this video:',
-                imageCompression: 'Image Compression',
-                stepsIntro: 'The image compression process using SVD includes the following steps:',
-                steps: [
-                    'The image is represented as a matrix for each color channel (R, G, B).',
-                    'SVD decomposition is calculated for each matrix: A = U × Σ × V<sup>T</sup>',
-                    'Matrix Σ contains singular values ordered by decreasing significance.',
-                    'Compression is achieved by using only the first k components of decomposition.',
-                    'The more components used, the more accurate the reconstructed image.'
+                whatIsSvd: 'What is SVD?',
+                svdDefinition: 'Singular Value Decomposition (SVD) is a linear algebra method that decomposes any matrix A of size m × n into three components:<br>A = U × Σ × V<sup>T</sup><br>where:',
+                svdComponents: [
+                    'U and V are orthogonal matrices,',
+                    'Σ is a diagonal matrix with singular values ordered in descending order.'
                 ],
-                effectiveFor: 'This method is particularly effective for images with repeating patterns and smooth color transitions.',
-                components: 'component',
-                componentsOf: 'of',
-                processingStatus: {
-                    scaling: 'Scaling image to 200px...',
-                    rgbSplit: 'Splitting image into RGB channels...',
-                    normalization: 'Normalizing data...',
-                    computing: 'Computing component'
-                },
-                errors: {
-                    compression: 'Compression error',
-                    processing: 'Error processing image',
-                    updating: 'Error updating image'
-                },
+                singularValuesExplanation: 'Singular values (elements of Σ) reflect the "importance" of information in the data: the larger they are, the stronger their influence on the structure of matrix A.',
+                howToApplySvd: 'How to Apply SVD to Images?',
+                imageAsMatrix: 'A grayscale image can be represented as a matrix where each element is a pixel brightness (from 0 to 255). A color image consists of three such matrices (for Red, Green, Blue channels).',
+                compressionIdea: 'Applying SVD to the image matrix, we get a set of singular values. <b>Compression idea</b>: keep only k largest singular values and discard the rest. This allows approximate image reconstruction with less data.',
+                compressionProcess: 'Compression Process',
+                compressionSteps: [
+                    '<b>Decomposition</b>: apply SVD to the image matrix.',
+                    '<b>Truncation</b>: keep the first k singular values (replace others with zeros).',
+                    '<b>Reconstruction</b>: multiply truncated matrices U<sub>k</sub>, Σ<sub>k</sub>, V<sub>k</sub><sup>T</sup> to get approximate matrix A<sub>k</sub> ≈ A.'
+                ],
+                sizeCalculation: '<b>Size Calculation Example</b>:',
+                sizeCalculationSteps: [
+                    'Original image: m × n pixels.',
+                    'After compression: store U<sub>k</sub> (m × k), Σ<sub>k</sub> (k × k), V<sub>k</sub><sup>T</sup> (k × n).',
+                    'New size: k(m + n + 1). When k << m, n the savings are significant!'
+                ],
+                qualityCompressionBalance: 'Balance Between Quality and Compression',
+                balanceExplanation: 'The smaller k, the higher the compression ratio but lower the quality. In practice, k is chosen experimentally, depending on acceptable losses. For example, with k = 50, the image can retain 90% of information while taking up 10 times less space.',
                 authorName: 'Ivan Antipov'
             }
         };
@@ -554,43 +561,32 @@
             });
             
             const theoryBlock = document.querySelector('.theory-block');
-            theoryBlock.querySelector('h3').textContent = t.howItWorks;
-            
-            const firstP = theoryBlock.querySelector('p');
-            firstP.innerHTML = t.theory;
-            
-            let videoContainer = theoryBlock.querySelector('.video-container');
-            if (!videoContainer) {
-                videoContainer = document.createElement('div');
-                videoContainer.className = 'video-container';
-                videoContainer.style.margin = '20px 0';
-                videoContainer.innerHTML = '<iframe width="100%" height="315" src="https://www.youtube.com/embed/vSczTbgc8Rc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
-                firstP.after(videoContainer);
-            }
-            
-            let compressionTitle = theoryBlock.querySelector('.compression-title');
-            if (!compressionTitle) {
-                compressionTitle = document.createElement('h4');
-                compressionTitle.className = 'compression-title';
-                compressionTitle.style.color = '#1a237e';
-                compressionTitle.style.marginTop = '30px';
-                videoContainer.after(compressionTitle);
-            }
-            compressionTitle.textContent = t.imageCompression;
-            
-            theoryBlock.querySelectorAll('p')[1].textContent = t.stepsIntro;
-            
-            const steps = theoryBlock.querySelectorAll('ol li');
-            steps.forEach((step, index) => {
-                step.innerHTML = t.steps[index];
-            });
-            
-            theoryBlock.querySelectorAll('p')[2].textContent = t.effectiveFor;
-            
-            const value = document.getElementById('singularValues').value;
-            const max = document.getElementById('singularValues').max;
-            document.getElementById('singularValuesDisplay').textContent = 
-                `${value} ${t.componentsOf} ${max}`;
+            theoryBlock.innerHTML = `
+                <h3>${t.howItWorks}</h3>
+                <h4>${t.whatIsSvd}</h4>
+                <p>${t.svdDefinition}</p>
+                <ul>
+                    ${t.svdComponents.map(comp => `<li>${comp}</li>`).join('')}
+                </ul>
+                <p>${t.singularValuesExplanation}</p>
+                
+                <h4>${t.howToApplySvd}</h4>
+                <p>${t.imageAsMatrix}</p>
+                <p>${t.compressionIdea}</p>
+                
+                <h4>${t.compressionProcess}</h4>
+                <ol>
+                    ${t.compressionSteps.map(step => `<li>${step}</li>`).join('')}
+                </ol>
+                
+                <p>${t.sizeCalculation}</p>
+                <ul>
+                    ${t.sizeCalculationSteps.map(step => `<li>${step}</li>`).join('')}
+                </ul>
+                
+                <h4>${t.qualityCompressionBalance}</h4>
+                <p>${t.balanceExplanation}</p>
+            `;
             
             const authorLink = document.querySelector('.author-link');
             authorLink.innerHTML = `${t.authorName} (<a href="https://t.me/ai_about_ai" target="_blank">@ai_about_ai</a>)`;
