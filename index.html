@@ -463,6 +463,13 @@
         .modal-close:hover {
             color: #000;
         }
+
+        .formula-centered {
+            display: block;
+            text-align: center;
+            margin: 15px 0;
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -591,12 +598,12 @@
                 singularValuesLabel: 'Количество собственных значений:',
                 loadingPrep: 'Подготовка к обработке...',
                 uploadButton: 'Загрузите изображение',
-                originalImage: 'Оригинальное изображение',
-                compressedImage: 'Сжатое изображение',
+                originalImage: 'Оригинальное изображение (A)',
+                compressedImage: 'Сжатое изображение (A<sub>k</sub>)',
                 svdMatrices: 'Матрицы SVD разложения',
                 howItWorks: 'Как это работает?',
                 whatIsSvd: 'Что такое SVD?',
-                svdDefinition: 'Сингулярное разложение (Singular Value Decomposition, SVD) — это метод линейной алгебры, который позволяет разложить матрицу A размером m × n на три компоненты:<br>A = U × Σ × V<sup>T</sup><br>где:',
+                svdDefinition: 'Сингулярное разложение (Singular Value Decomposition, SVD) — это метод линейной алгебры, который позволяет разложить матрицу A размером m × n на три компоненты:<div class="formula-centered">A = U × Σ × V<sup>T</sup></div>где:',
                 svdComponents: [
                     'U и V — ортогональные матрицы,',
                     'Σ — диагональная матрица с сингулярными значениями, упорядоченными по убыванию.'
@@ -636,12 +643,12 @@
                 singularValuesLabel: 'Number of singular values:',
                 loadingPrep: 'Preparing for processing...',
                 uploadButton: 'Upload Image',
-                originalImage: 'Original Image',
-                compressedImage: 'Compressed Image',
+                originalImage: 'Original Image (A)',
+                compressedImage: 'Compressed Image (A<sub>k</sub>)',
                 svdMatrices: 'SVD Decomposition Matrices',
                 howItWorks: 'How It Works?',
                 whatIsSvd: 'What is SVD?',
-                svdDefinition: 'Singular Value Decomposition (SVD) is a linear algebra method that decomposes any matrix A of size m × n into three components:<br>A = U × Σ × V<sup>T</sup><br>where:',
+                svdDefinition: 'Singular Value Decomposition (SVD) is a linear algebra method that decomposes any matrix A of size m × n into three components:<div class="formula-centered">A = U × Σ × V<sup>T</sup></div>where:',
                 svdComponents: [
                     'U and V are orthogonal matrices,',
                     'Σ is a diagonal matrix with singular values ordered in descending order.'
@@ -649,18 +656,18 @@
                 singularValuesExplanation: 'Singular values (elements of Σ) reflect the "importance" of information in the data: the larger they are, the stronger their influence on the structure of matrix A.',
                 howToApplySvd: 'How to Apply SVD to Images?',
                 imageAsMatrix: 'A grayscale image can be represented as a matrix where each element is a pixel brightness (from 0 to 255). A color image consists of three such matrices (for Red, Green, Blue channels).',
-                compressionIdea: 'Applying SVD to the image matrix, we get a set of singular values. <b>Compression idea</b>: keep only k largest singular values and discard the rest. This allows approximate image reconstruction with less data.',
+                compressionIdea: 'Applying SVD to the image matrix, we get a set of singular values. <b>Compression idea</b>: keep only top-k largest singular values and discard the rest. This allows approximate image reconstruction using less data.',
                 compressionProcess: 'Compression Process',
                 compressionSteps: [
                     '<b>Decomposition</b>: apply SVD to the image matrix.',
-                    '<b>Truncation</b>: keep the first k singular values (replace others with zeros).',
+                    '<b>Truncation</b>: keep the first k singular values.',
                     '<b>Reconstruction</b>: multiply truncated matrices U<sub>k</sub>, Σ<sub>k</sub>, V<sub>k</sub><sup>T</sup> to get approximate matrix A<sub>k</sub> ≈ A.'
                 ],
-                sizeCalculation: '<b>Size Calculation Example</b>:',
+                sizeCalculation: '<b>How is memory saved?</b>:',
                 sizeCalculationSteps: [
-                    'Original image: m × n pixels.',
-                    'After compression: store U<sub>k</sub> (m × k), Σ<sub>k</sub> (k × k), V<sub>k</sub><sup>T</sup> (k × n).',
-                    'New size: k(m + n + 1). When k << m, n the savings are significant!'
+                    'Original image is defined by [m × n] pixels (numbers).',
+                    'After compression we store [m × k] (U<sub>k</sub>) + [k] (Σ<sub>k</sub>) + [k × n] (V<sub>k</sub><sup>T</sup>) values, that is [k(m + n + 1)].',
+                    'When k << m, n the amount of data decreases by an order of magnitude.'
                 ],
                 qualityCompressionBalance: 'Balance Between Quality and Compression',
                 balanceExplanation: 'The smaller k, the higher the compression ratio but lower the quality. In practice, k is chosen experimentally, depending on acceptable losses. For example, with k = 50, the image can retain 90% of information while taking up 10 times less space.',
@@ -701,9 +708,9 @@
                 '<input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">';
             
             document.querySelectorAll('.sub-block h3').forEach((h3, index) => {
-                if (index === 0) h3.textContent = t.originalImage;
-                if (index === 1) h3.textContent = t.compressedImage;
-                if (index === 2) h3.textContent = t.svdMatrices;
+                if (index === 0) h3.innerHTML = t.originalImage;
+                if (index === 1) h3.innerHTML = t.compressedImage;
+                if (index === 2) h3.innerHTML = t.svdMatrices;
             });
             
             const theoryBlock = document.querySelector('.theory-block');
