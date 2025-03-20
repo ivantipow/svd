@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SVD Image Compression</title>
+    <title>Singular Value Decomposition for Image Compression</title>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
     <style>
         body {
@@ -336,11 +336,29 @@
             font-family: monospace;
             align-self: center;
         }
+        .language-switch {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: #1a237e;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .language-switch:hover {
+            background-color: #283593;
+        }
     </style>
 </head>
 <body>
+    <button class="language-switch" onclick="toggleLanguage()">RU</button>
     <div class="container">
-        <h1 class="page-title">Усеченное SVD разложения для сжатия изображений</h1>
+        <h1 class="page-title">Singular Value Decomposition for Image Compression</h1>
         
         <div class="control-panel">
             <div class="slider-container">
@@ -420,16 +438,130 @@
             <p>Этот метод особенно эффективен для изображений с повторяющимися паттернами и плавными переходами цветов.</p>
         </div>
 
-        <div class="author-link">
-            <a href="https://t.me/ai_about_ai" target="_blank">@ai_about_ai</a>
+        <div class="author-link">Иван Антипов  
+            (<a href="https://t.me/ai_about_ai" target="_blank">@ai_about_ai</a>)
         </div>
 
         <img id="originalImage" style="display: none;">
     </div>
 
     <script>
-        // Инициализация элементов после загрузки DOM
+        let currentLanguage = 'en';
+
+        const translations = {
+            ru: {
+                pageTitle: 'Сингулярное разложение для сжатия изображений',
+                singularValuesLabel: 'Количество собственных значений:',
+                loadingPrep: 'Подготовка к обработке...',
+                uploadButton: 'Загрузите изображение',
+                originalImage: 'Оригинальное изображение',
+                compressedImage: 'Сжатое изображение',
+                svdMatrices: 'Матрицы SVD разложения',
+                howItWorks: 'Как это работает?',
+                theory: 'Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>.',
+                steps: [
+                    'Изображение представляется в виде матрицы для каждого цветового канала (R, G, B).',
+                    'Для каждой матрицы вычисляется SVD разложение: A = U × Σ × V<sup>T</sup>',
+                    'Матрица Σ содержит сингулярные значения, упорядоченные по убыванию их значимости.',
+                    'Сжатие достигается путем использования только первых k компонент разложения.',
+                    'Чем больше компонент используется, тем точнее восстановленное изображение.'
+                ],
+                effectiveFor: 'Этот метод особенно эффективен для изображений с повторяющимися паттернами и плавными переходами цветов.',
+                components: 'компонента',
+                componentsOf: 'из',
+                processingStatus: {
+                    scaling: 'Масштабирование изображения до 200px...',
+                    rgbSplit: 'Разделение изображения на RGB каналы...',
+                    normalization: 'Нормализация данных...',
+                    computing: 'Вычисление компоненты'
+                },
+                errors: {
+                    compression: 'Ошибка при сжатии',
+                    processing: 'Ошибка при обработке изображения',
+                    updating: 'Ошибка при обновлении изображения'
+                }
+            },
+            en: {
+                pageTitle: 'Singular Value Decomposition for Image Compression',
+                singularValuesLabel: 'Number of singular values:',
+                loadingPrep: 'Preparing for processing...',
+                uploadButton: 'Upload Image',
+                originalImage: 'Original Image',
+                compressedImage: 'Compressed Image',
+                svdMatrices: 'SVD Decomposition Matrices',
+                howItWorks: 'How It Works?',
+                theory: 'Singular Value Decomposition (SVD) is a matrix factorization method that allows representing an image as a product of three matrices: U, Σ, and V<sup>T</sup>.',
+                steps: [
+                    'The image is represented as a matrix for each color channel (R, G, B).',
+                    'SVD decomposition is calculated for each matrix: A = U × Σ × V<sup>T</sup>',
+                    'Matrix Σ contains singular values ordered by decreasing significance.',
+                    'Compression is achieved by using only the first k components of decomposition.',
+                    'The more components used, the more accurate the reconstructed image.'
+                ],
+                effectiveFor: 'This method is particularly effective for images with repeating patterns and smooth color transitions.',
+                components: 'component',
+                componentsOf: 'of',
+                processingStatus: {
+                    scaling: 'Scaling image to 200px...',
+                    rgbSplit: 'Splitting image into RGB channels...',
+                    normalization: 'Normalizing data...',
+                    computing: 'Computing component'
+                },
+                errors: {
+                    compression: 'Compression error',
+                    processing: 'Error processing image',
+                    updating: 'Error updating image'
+                }
+            }
+        };
+
+        function toggleLanguage() {
+            const button = document.querySelector('.language-switch');
+            currentLanguage = currentLanguage === 'ru' ? 'en' : 'ru';
+            button.textContent = currentLanguage === 'ru' ? 'RU' : 'EN';
+            updatePageLanguage();
+        }
+
+        function updatePageLanguage() {
+            const t = translations[currentLanguage];
+            
+            document.title = t.pageTitle;
+            
+            document.querySelector('.page-title').innerHTML = t.pageTitle;
+            
+            document.querySelector('label[for="singularValues"]').textContent = t.singularValuesLabel;
+            
+            document.getElementById('loadingStatus').textContent = t.loadingPrep;
+            
+            const fileUploadButton = document.querySelector('.file-upload-button');
+            fileUploadButton.innerHTML = t.uploadButton + 
+                '<input type="file" id="imageInput" accept="image/*" onchange="handleImageUpload(event)">';
+            
+            document.querySelectorAll('.sub-block h3').forEach((h3, index) => {
+                if (index === 0) h3.textContent = t.originalImage;
+                if (index === 1) h3.textContent = t.compressedImage;
+                if (index === 2) h3.textContent = t.svdMatrices;
+            });
+            
+            const theoryBlock = document.querySelector('.theory-block');
+            theoryBlock.querySelector('h3').textContent = t.howItWorks;
+            theoryBlock.querySelector('p').innerHTML = t.theory;
+            
+            const steps = theoryBlock.querySelectorAll('ol li');
+            steps.forEach((step, index) => {
+                step.innerHTML = t.steps[index];
+            });
+            
+            theoryBlock.querySelectorAll('p')[1].textContent = t.effectiveFor;
+            
+            const value = document.getElementById('singularValues').value;
+            const max = document.getElementById('singularValues').max;
+            document.getElementById('singularValuesDisplay').textContent = 
+                `${value} ${t.componentsOf} ${max}`;
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            updatePageLanguage();
             const singularValuesInput = document.getElementById('singularValues');
             const singularValuesDisplay = document.getElementById('singularValuesDisplay');
             
@@ -452,18 +584,16 @@
                 compressImage(this, 1);
             };
             
-            // Добавляем debouncing для обработчика слайдера
             singularValuesInput.addEventListener('input', function() {
                 const value = parseInt(this.value);
                 const max = parseInt(this.max);
-                singularValuesDisplay.textContent = `${value} из ${max}`;
+                const t = translations[currentLanguage];
+                singularValuesDisplay.textContent = `${value} ${t.componentsOf} ${max}`;
                 
-                // Отменяем предыдущий таймаут
                 if (compressTimeout) {
                     clearTimeout(compressTimeout);
                 }
                 
-                // Устанавливаем новый таймаут только если SVD уже выполнено
                 if (svdResults.R.V.length > 0) {
                 compressTimeout = setTimeout(() => {
                     const img = document.getElementById('originalImage');
@@ -475,28 +605,23 @@
             });
         });
 
-        // Остальной код без изменений
         function handleImageUpload(event) {
             const fileInput = event.target;
             if (fileInput.files[0]) {
-                // Показываем canvas при загрузке изображения
                 document.getElementById('originalCanvas').style.display = 'block';
                 document.getElementById('compressedCanvas').style.display = 'block';
                 document.querySelector('.matrices').style.display = 'flex';
                 
-                // Показываем canvas матриц
                 document.getElementById('uMatrixCanvas').style.display = 'block';
                 document.getElementById('sigmaMatrixCanvas').style.display = 'block';
                 document.getElementById('vMatrixCanvas').style.display = 'block';
                 
-                // Немедленно скрываем контейнер с кнопкой загрузки
                 document.querySelector('.file-upload-container').style.display = 'none';
                 
                 const reader = new FileReader();
                 reader.onload = function(e) {
                     const img = document.getElementById('originalImage');
                     img.onload = function() {
-                        // Сначала отрисовываем оригинальное изображение
                         updateLoadingStatus('Масштабирование изображения до 200px...');
                         document.getElementById('loadingIndicator').style.display = 'block';
                         
@@ -517,17 +642,14 @@
             }
         }
         function drawOriginalImage(img) {
-            // Изменяем максимальный размер до 200 пикселей
             const maxSize = 200;
             let width = img.width;
             let height = img.height;
             
-            // Вычисляем коэффициент масштабирования
-                const ratio = Math.min(maxSize / width, maxSize / height);
-                width = Math.floor(width * ratio);
-                height = Math.floor(height * ratio);
+            const ratio = Math.min(maxSize / width, maxSize / height);
+            width = Math.floor(width * ratio);
+            height = Math.floor(height * ratio);
             
-            // Сохраняем размеры для обоих canvas
             originalCanvas.width = width;
             originalCanvas.height = height;
             compressedCanvas.width = width;
@@ -538,7 +660,6 @@
             ctx.imageSmoothingQuality = 'high';
             ctx.drawImage(img, 0, 0, width, height);
             
-            // Устанавливаем только максимальные размеры
             originalCanvas.style.maxWidth = '100%';
             originalCanvas.style.maxHeight = '100%';
             compressedCanvas.style.maxWidth = '100%';
@@ -550,16 +671,14 @@
             console.log(`Использовано компонент: ${k}`);
         }
 
-        // Добавим обработчик изменения количества собственных значений
         document.getElementById('singularValues').addEventListener('input', function() {
             const img = document.getElementById('originalImage');
-            if (img.src) {  // Если изображение загружено
+            if (img.src) {
                 compressImage(img, parseInt(this.value))
                     .catch(error => console.error('Ошибка при сжатии:', error));
             }
         });
 
-        // Добавляем глобальные переменные для хранения SVD результатов
         let svdResults = {
             R: { V: [], covMatrix: null, mean: null },
             G: { V: [], covMatrix: null, mean: null },
@@ -567,11 +686,13 @@
         };
 
         function updateLoadingStatus(status) {
+            const t = translations[currentLanguage].processingStatus;
             const loadingIndicator = document.getElementById('loadingIndicator');
             const loadingStatus = document.getElementById('loadingStatus');
             
             loadingIndicator.style.display = 'block';
-            loadingStatus.textContent = status;
+            loadingStatus.textContent = status.startsWith('Computing') ? 
+                `${t.computing} ${status.split(' ')[2]}...` : t[status.toLowerCase()];
         }
 
         async function performInitialSVD(matrix, channel) {
@@ -617,14 +738,12 @@
 
         async function updateCompressedImage(k) {
             try {
-                // Создаем временный canvas для двойной буферизации
                 const tempCanvas = document.createElement('canvas');
                 const width = originalCanvas.width;
                 const height = originalCanvas.height;
                 tempCanvas.width = width;
                 tempCanvas.height = height;
                 
-                // Используем сохраненные размеры оригинального изображения
                 const compressedR = await reconstructImage('R', k);
                 const compressedG = await reconstructImage('G', k);
                 const compressedB = await reconstructImage('B', k);
@@ -635,7 +754,6 @@
                     compressedB.array()
                 ]);
 
-                // Отрисовка результата во временный canvas
                 const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
                 const imageData = tempCtx.createImageData(width, height);
 
@@ -651,16 +769,13 @@
 
                 tempCtx.putImageData(imageData, 0, 0);
 
-                // Только когда изображение полностью готово, копируем его в основной canvas
                 compressedCanvas.width = width;
                 compressedCanvas.height = height;
                 const compressedCtx = compressedCanvas.getContext('2d');
                 compressedCtx.drawImage(tempCanvas, 0, 0);
 
-                // Добавляем визуализацию SVD матриц
                 await visualizeSVDMatrices(k);
 
-                // Убеждаемся, что стили сохранены
                 compressedCanvas.style.maxWidth = '100%';
                 compressedCanvas.style.maxHeight = '100%';
             } catch (error) {
@@ -675,13 +790,11 @@
                 const { V, mean, centeredMatrix } = svdResults[channel];
                 console.log(`[${channel}] Данные получены, начало реконструкции`);
                 
-                // Проверяем, что у нас есть достаточно компонент
                 if (k <= 0 || k > V.length) {
                     console.error(`Некорректное количество компонент: ${k}. Доступно: ${V.length}`);
                     return tf.zeros(centeredMatrix.shape);
                 }
 
-                // Берем нужное количество компонент
                 const components = V.slice(0, k);
                 if (components.length === 0) {
                     console.error('Нет компонент для реконструкции');
@@ -698,14 +811,12 @@
             });
         }
 
-        // Добавляем задержку между обработкой кадров
         let processingTimeout = null;
 
         function resizeImage(img, maxSize) {
             const tempCanvas = document.createElement('canvas');
             const tempCtx = tempCanvas.getContext('2d');
             
-            // Вычисляем новые размеры, сохраняя пропорции
             let width = img.width;
             let height = img.height;
             
@@ -717,11 +828,9 @@
                 height = maxSize;
             }
             
-            // Устанавливаем размеры временного canvas
             tempCanvas.width = width;
             tempCanvas.height = height;
             
-            // Рисуем уменьшенное изображение
             tempCtx.drawImage(img, 0, 0, width, height);
             
             return tempCtx.getImageData(0, 0, width, height);
@@ -749,7 +858,6 @@
                     const gTensor = tf.tensor2d(g, [height, width]);
                     const bTensor = tf.tensor2d(b, [height, width]);
 
-                    // Инициализация SVD для всех каналов
                     const [rInit, gInit, bInit] = await Promise.all([
                         performInitialSVD(rTensor, 'R'),
                         performInitialSVD(gTensor, 'G'),
@@ -758,18 +866,15 @@
 
                     const maxK = Math.min(50, Math.min(width, height));
                     
-                    // Вычисляем компоненты последовательно
                     for (let i = 0; i < maxK; i++) {
                         updateLoadingStatus(`Вычисление компоненты ${i + 1} из ${maxK}...`);
                         
-                        // Вычисляем следующую компоненту для каждого канала
                         await Promise.all([
                             computeNextComponent('R', rInit.covMatrix, rInit.shape),
                             computeNextComponent('G', gInit.covMatrix, gInit.shape),
                             computeNextComponent('B', bInit.covMatrix, bInit.shape)
                         ]);
 
-                        // Обновляем изображение после вычисления каждой компоненты
                         const currentK = i + 1;
                         const singularValuesInput = document.getElementById('singularValues');
                         const singularValuesDisplay = document.getElementById('singularValuesDisplay');
@@ -779,11 +884,9 @@
                         
                         await updateCompressedImage(currentK);
                         
-                        // Небольшая задержка для обновления UI
                         await new Promise(resolve => setTimeout(resolve, 10));
                     }
 
-                    // Скрываем индикатор загрузки сразу после завершения вычислений
                     document.getElementById('loadingIndicator').style.display = 'none';
                 } else {
                     await updateCompressedImage(singularValues);
@@ -811,23 +914,19 @@
         }
 
         function visualizeMatrix(canvas, dataR, dataG, dataB, width, height, fullWidth, fullHeight, drawBorder = false) {
-            // Устанавливаем размер canvas по максимальным размерам
             canvas.width = fullWidth;
             canvas.height = fullHeight;
             const ctx = canvas.getContext('2d');
             
-            // Очищаем canvas
             ctx.fillStyle = '#f8f9fa';
             ctx.fillRect(0, 0, fullWidth, fullHeight);
             
-            // Создаем временный canvas для данных
             const tempCanvas = document.createElement('canvas');
             tempCanvas.width = width;
             tempCanvas.height = height;
             const tempCtx = tempCanvas.getContext('2d');
             const imageData = tempCtx.createImageData(width, height);
             
-            // Находим минимальное и максимальное значения для всех каналов
             let min = Infinity;
             let max = -Infinity;
             for (let i = 0; i < dataR.length; i++) {
@@ -835,7 +934,6 @@
                 max = Math.max(max, dataR[i], dataG[i], dataB[i]);
             }
             
-            // Нормализуем значения и отрисовываем в RGB
             for (let i = 0; i < dataR.length; i++) {
                 const normalizedR = (dataR[i] - min) / (max - min);
                 const normalizedG = (dataG[i] - min) / (max - min);
@@ -850,21 +948,17 @@
             
             tempCtx.putImageData(imageData, 0, 0);
             
-            // Копируем данные в основной canvas (в левый верхний угол)
             ctx.drawImage(tempCanvas, 0, 0);
 
-            // Рисуем рамку по максимальным размерам
             if (drawBorder) {
                 ctx.strokeStyle = '#000';
                 ctx.lineWidth = 1;
                 ctx.strokeRect(0, 0, fullWidth, fullHeight);
 
-                // Рисуем пунктирную рамку текущего размера
                 ctx.strokeStyle = '#666';
                 ctx.setLineDash([2, 2]);
                 ctx.strokeRect(0, 0, width, height);
                 
-                // Для Sigma матрицы рисуем диагональ
                 if (fullWidth === fullHeight) {
                     ctx.beginPath();
                     ctx.setLineDash([2, 2]);
@@ -882,26 +976,21 @@
             
             if (!VR.length) return;
 
-            // Получаем размеры из центрированной матрицы
             const height = centeredMatrixR.shape[0];
             const width = centeredMatrixR.shape[1];
             const maxK = Math.min(50, Math.min(width, height));
 
-            // Вычисляем U и Sigma для каждого канала
             const processChannel = async (V, centeredMatrix) => {
                 const components = V.slice(0, k);
                 const basisMatrix = tf.concat(components, 1);
                 
-                // U = X * V
                 const U = tf.matMul(centeredMatrix, basisMatrix);
                 
-                // Sigma = диагональная матрица сингулярных значений
                 const sigma = await Promise.all(components.map(async (v) => {
                     const norm = await tf.norm(tf.matMul(centeredMatrix, v)).array();
                     return norm;
                 }));
 
-                // Получаем данные матриц
                 const uData = await U.array();
                 const vData = await tf.concat(components, 1).transpose().array();
 
@@ -912,22 +1001,18 @@
                 };
             };
 
-            // Получаем данные для всех каналов
             const [dataR, dataG, dataB] = await Promise.all([
                 processChannel(VR, centeredMatrixR),
                 processChannel(VG, centeredMatrixG),
                 processChannel(VB, centeredMatrixB)
             ]);
 
-            // Визуализируем матрицы с полными размерами
             const uCanvas = document.getElementById('uMatrixCanvas');
             const sigmaCanvas = document.getElementById('sigmaMatrixCanvas');
             const vCanvas = document.getElementById('vMatrixCanvas');
 
-            // U матрица: height x maxK (текущий размер: height x k)
             visualizeMatrix(uCanvas, dataR.U, dataG.U, dataB.U, k, height, maxK, height, true);
             
-            // Sigma: maxK x maxK (текущий размер: k x k)
             const sigmaSize = k;
             const sigmaMatrixR = new Float32Array(sigmaSize * sigmaSize);
             const sigmaMatrixG = new Float32Array(sigmaSize * sigmaSize);
@@ -942,17 +1027,13 @@
             visualizeMatrix(sigmaCanvas, sigmaMatrixR, sigmaMatrixG, sigmaMatrixB, 
                 k, k, maxK, maxK, true);
             
-            // V^T матрица: maxK x width (текущий размер: k x width)
             visualizeMatrix(vCanvas, dataR.V, dataG.V, dataB.V, width, k, width, maxK, true);
 
-            // Обновляем размерности под матрицами
             function updateDimensions(elementId, width, height, fullWidth, fullHeight) {
                 const dimensionsDiv = document.getElementById(elementId);
                 if (elementId === 'sigmaDimensions') {
-                    // Для матрицы Sigma показываем только одно число
-                    dimensionsDiv.innerHTML = `${width}`; // Так как width === height для Sigma
+                    dimensionsDiv.innerHTML = `${width}`;
                 } else {
-                    // Для остальных матриц показываем полные размеры
                     dimensionsDiv.innerHTML = `${height}×${width}`;
                 }
             }
