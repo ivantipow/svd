@@ -488,7 +488,12 @@
                 <div id="loadingIndicator" style="display: none;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="spinner"></div>
-                        <div id="loadingStatus">Подготовка к обработке...</div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div id="loadingStatus">Подготовка к обработке...</div>
+                            <div style="color: #666; font-size: 12px;" id="timeRemaining">
+                                Осталось менее 1 минуты...
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -620,7 +625,8 @@
                     rgbSplit: 'Разделение изображения на RGB каналы...',
                     normalization: 'Нормализация данных...',
                     computing: 'Вычисление компоненты',
-                    error: 'Произошла ошибка при обработке изображения'
+                    error: 'Произошла ошибка при обработке изображения',
+                    timeRemaining: 'Осталось менее 1 минуты...'
                 },
                 componentsOf: 'из',
                 initialComponent: '1 компонента'
@@ -664,7 +670,8 @@
                     rgbSplit: 'Splitting image into RGB channels...',
                     normalization: 'Normalizing data...',
                     computing: 'Computing component',
-                    error: 'Error processing image'
+                    error: 'Error processing image',
+                    timeRemaining: 'Less than 1 minute...'
                 },
                 componentsOf: 'of',
                 initialComponent: '1 component'
@@ -868,10 +875,12 @@
             const t = translations[currentLanguage].processingStatus;
             const loadingIndicator = document.getElementById('loadingIndicator');
             const loadingStatus = document.getElementById('loadingStatus');
+            const timeRemaining = document.getElementById('timeRemaining');
             
             loadingIndicator.style.display = 'block';
             loadingStatus.textContent = status.startsWith('Computing') ? 
                 `${t.computing} ${status.split(' ')[2]}...` : t[status.toLowerCase()];
+            timeRemaining.textContent = t.timeRemaining;
         }
 
         async function performInitialSVD(matrix, channel) {
