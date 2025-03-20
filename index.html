@@ -410,6 +410,59 @@
             transform: translateX(-50%);
             top: 1px;
         }
+
+        /* Добавляем стили для модального окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            cursor: pointer;
+        }
+
+        .modal-content {
+            position: relative;
+            margin: auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            cursor: default;
+        }
+
+        .modal canvas {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+        }
+
+        /* Добавляем стили для курсора на матрицах */
+        .matrix-container canvas {
+            cursor: pointer;
+        }
+
+        .modal-close {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .modal-close:hover {
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -515,6 +568,13 @@
         </div>
 
         <img id="originalImage" style="display: none;">
+    </div>
+
+    <div id="matrixModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <canvas id="modalCanvas"></canvas>
+        </div>
     </div>
 
     <script>
@@ -1069,24 +1129,6 @@
             tempCtx.putImageData(imageData, 0, 0);
             
             ctx.drawImage(tempCanvas, 0, 0);
-
-            if (drawBorder) {
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 1;
-                ctx.strokeRect(0, 0, fullWidth, fullHeight);
-
-                ctx.strokeStyle = '#666';
-                ctx.setLineDash([2, 2]);
-                ctx.strokeRect(0, 0, width, height);
-                
-                if (fullWidth === fullHeight) {
-                    ctx.beginPath();
-                    ctx.setLineDash([2, 2]);
-                    ctx.moveTo(0, 0);
-                    ctx.lineTo(fullWidth, fullHeight);
-                    ctx.stroke();
-                }
-            }
         }
 
         async function visualizeSVDMatrices(k) {
@@ -1131,7 +1173,7 @@
             const sigmaCanvas = document.getElementById('sigmaMatrixCanvas');
             const vCanvas = document.getElementById('vMatrixCanvas');
 
-            visualizeMatrix(uCanvas, dataR.U, dataG.U, dataB.U, k, height, maxK, height, true);
+            visualizeMatrix(uCanvas, dataR.U, dataG.U, dataB.U, k, height, maxK, height);
             
             const sigmaSize = k;
             const sigmaMatrixR = new Float32Array(sigmaSize * sigmaSize);
@@ -1145,9 +1187,9 @@
             }
             
             visualizeMatrix(sigmaCanvas, sigmaMatrixR, sigmaMatrixG, sigmaMatrixB, 
-                k, k, maxK, maxK, true);
+                k, k, maxK, maxK);
             
-            visualizeMatrix(vCanvas, dataR.V, dataG.V, dataB.V, width, k, width, maxK, true);
+            visualizeMatrix(vCanvas, dataR.V, dataG.V, dataB.V, width, k, width, maxK);
 
             function updateDimensions(elementId, width, height, fullWidth, fullHeight) {
                 const dimensionsDiv = document.getElementById(elementId);
@@ -1162,6 +1204,44 @@
             updateDimensions('sigmaDimensions', k, k, maxK, maxK);
             updateDimensions('vDimensions', width, k, width, maxK);
         }
+
+        // Добавляем обработчики для открытия/закрытия модального окна
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('matrixModal');
+            const modalCanvas = document.getElementById('modalCanvas');
+            const modalClose = document.querySelector('.modal-close');
+            
+            // Добавляем обработчики кликов для каждой матрицы
+            ['uMatrixCanvas', 'sigmaMatrixCanvas', 'vMatrixCanvas'].forEach(id => {
+                const canvas = document.getElementById(id);
+                canvas.addEventListener('click', function() {
+                    modal.style.display = 'block';
+                    // Копируем содержимое канваса в модальное окно
+                    modalCanvas.width = this.width;
+                    modalCanvas.height = this.height;
+                    const ctx = modalCanvas.getContext('2d');
+                    ctx.drawImage(this, 0, 0);
+                });
+            });
+
+            // Закрытие по клику на крестик
+            modalClose.addEventListener('click', function(e) {
+                e.stopPropagation();
+                modal.style.display = 'none';
+            });
+
+            // Закрытие по клику вне изображения
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Предотвращаем закрытие при клике на само изображение
+            modalCanvas.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        });
     </script>
 </body>
 </html>
