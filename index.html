@@ -493,7 +493,14 @@
                 ],
                 qualityCompressionBalance: 'Баланс между качеством и сжатием',
                 balanceExplanation: 'Чем меньше k, тем выше степень сжатия, но ниже качество. На практике k выбирают экспериментально, в зависимости от допустимых потерь. Например, при k = 50 изображение может сохранить 90% информации, но занять в 10 раз меньше места.',
-                authorName: 'Иван Антипов'
+                authorName: 'Иван Антипов',
+                processingStatus: {
+                    scaling: 'Масштабирование изображения до 200px...',
+                    rgbSplit: 'Разделение изображения на RGB каналы...',
+                    normalization: 'Нормализация данных...',
+                    computing: 'Вычисление компоненты',
+                    error: 'Произошла ошибка при обработке изображения'
+                }
             },
             en: {
                 pageTitle: 'Singular Value Decomposition for Image Compression',
@@ -528,7 +535,14 @@
                 ],
                 qualityCompressionBalance: 'Balance Between Quality and Compression',
                 balanceExplanation: 'The smaller k, the higher the compression ratio but lower the quality. In practice, k is chosen experimentally, depending on acceptable losses. For example, with k = 50, the image can retain 90% of information while taking up 10 times less space.',
-                authorName: 'Ivan Antipov'
+                authorName: 'Ivan Antipov',
+                processingStatus: {
+                    scaling: 'Scaling image to 200px...',
+                    rgbSplit: 'Splitting image into RGB channels...',
+                    normalization: 'Normalizing data...',
+                    computing: 'Computing component',
+                    error: 'Error processing image'
+                }
             }
         };
 
@@ -655,17 +669,18 @@
                 reader.onload = function(e) {
                     const img = document.getElementById('originalImage');
                     img.onload = function() {
-                        updateLoadingStatus('Масштабирование изображения до 200px...');
+                        const t = translations[currentLanguage].processingStatus;
+                        updateLoadingStatus(t.scaling);
                         document.getElementById('loadingIndicator').style.display = 'block';
                         
                         drawOriginalImage(img);
                         
                         setTimeout(() => {
-                        const singularValues = parseInt(document.getElementById('singularValues').value);
-                        compressImage(img, singularValues)
+                            const singularValues = parseInt(document.getElementById('singularValues').value);
+                            compressImage(img, singularValues)
                                 .catch(error => {
                                     console.error('Ошибка при сжатии:', error);
-                                    updateLoadingStatus('Произошла ошибка при обработке изображения');
+                                    updateLoadingStatus(t.error);
                                 });
                         }, 0);
                     };
