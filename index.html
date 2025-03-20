@@ -500,7 +500,9 @@
                     normalization: 'Нормализация данных...',
                     computing: 'Вычисление компоненты',
                     error: 'Произошла ошибка при обработке изображения'
-                }
+                },
+                componentsOf: 'из',
+                initialComponent: '1 компонента'
             },
             en: {
                 pageTitle: 'Singular Value Decomposition for Image Compression',
@@ -542,7 +544,9 @@
                     normalization: 'Normalizing data...',
                     computing: 'Computing component',
                     error: 'Error processing image'
-                }
+                },
+                componentsOf: 'of',
+                initialComponent: '1 component'
             }
         };
 
@@ -604,6 +608,12 @@
             
             const authorLink = document.querySelector('.author-link');
             authorLink.innerHTML = `${t.authorName} (<a href="https://t.me/ai_about_ai" target="_blank">@ai_about_ai</a>)`;
+
+            // Обновляем начальное значение слайдера
+            const singularValuesDisplay = document.getElementById('singularValuesDisplay');
+            if (!document.getElementById('originalImage').src) {
+                singularValuesDisplay.textContent = t.initialComponent;
+            }
         }
 
         document.addEventListener('DOMContentLoaded', function() {
