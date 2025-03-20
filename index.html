@@ -201,7 +201,7 @@
         }
 
         #singularValues {
-            width: 200px;
+            width: 400px;
             margin: 0;
         }
 
@@ -273,6 +273,14 @@
             #originalCanvas, #compressedCanvas {
                 width: 150px;
                 height: 100px;
+            }
+
+            .slider-wrapper {
+                width: 100%;
+            }
+            
+            .slider-ticks {
+                font-size: 10px;
             }
         }
 
@@ -359,6 +367,49 @@
             margin-top: 20px;
             margin-bottom: 10px;
         }
+
+        /* Добавляем новые стили */
+        .slider-wrapper {
+            position: relative;
+            width: 400px;
+            margin: 0;
+        }
+
+        .slider-ticks {
+            display: flex;
+            justify-content: space-between;
+            padding: 0;
+            margin-top: 2px;
+            font-size: 12px;
+            color: #666;
+            position: relative;
+            width: calc(100% - 16px);
+            margin-left: 8px;
+        }
+
+        .slider-tick {
+            position: relative;
+            text-align: center;
+            width: 0;
+        }
+
+        .slider-tick::before {
+            content: '';
+            position: absolute;
+            top: -3px;
+            left: 0;
+            transform: translateX(-50%);
+            width: 1px;
+            height: 4px;
+            background-color: #666;
+        }
+
+        .slider-tick span {
+            position: absolute;
+            left: 0;
+            transform: translateX(-50%);
+            top: 1px;
+        }
     </style>
 </head>
 <body>
@@ -369,7 +420,17 @@
         <div class="control-panel">
             <div class="slider-container">
                 <label for="singularValues">Количество собственных значений: </label>
-                <input type="range" id="singularValues" min="1" max="50" value="1" step="1">
+                <div class="slider-wrapper">
+                    <input type="range" id="singularValues" min="1" max="50" value="1" step="1">
+                    <div class="slider-ticks">
+                        <span class="slider-tick"><span>1</span></span>
+                        <span class="slider-tick"><span>10</span></span>
+                        <span class="slider-tick"><span>20</span></span>
+                        <span class="slider-tick"><span>30</span></span>
+                        <span class="slider-tick"><span>40</span></span>
+                        <span class="slider-tick"><span>50</span></span>
+                    </div>
+                </div>
                 <span id="singularValuesDisplay">1 компонента</span>
                 <div id="loadingIndicator" style="display: none;">
                     <div style="display: flex; align-items: center; gap: 10px;">
@@ -652,13 +713,13 @@
                 }
                 
                 if (svdResults.R.V.length > 0) {
-                    compressTimeout = setTimeout(() => {
-                        const img = document.getElementById('originalImage');
-                        if (img.src) {
+                compressTimeout = setTimeout(() => {
+                    const img = document.getElementById('originalImage');
+                    if (img.src) {
                             updateCompressedImage(value);
                         }
                     }, 100);
-                }
+                    }
             });
         });
 
@@ -686,8 +747,8 @@
                         drawOriginalImage(img);
                         
                         setTimeout(() => {
-                            const singularValues = parseInt(document.getElementById('singularValues').value);
-                            compressImage(img, singularValues)
+                        const singularValues = parseInt(document.getElementById('singularValues').value);
+                        compressImage(img, singularValues)
                                 .catch(error => {
                                     console.error('Ошибка при сжатии:', error);
                                     updateLoadingStatus(t.error);
@@ -704,9 +765,9 @@
             let width = img.width;
             let height = img.height;
             
-            const ratio = Math.min(maxSize / width, maxSize / height);
-            width = Math.floor(width * ratio);
-            height = Math.floor(height * ratio);
+                const ratio = Math.min(maxSize / width, maxSize / height);
+                width = Math.floor(width * ratio);
+                height = Math.floor(height * ratio);
             
             originalCanvas.width = width;
             originalCanvas.height = height;
