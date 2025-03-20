@@ -426,7 +426,11 @@
 
         <div class="theory-block">
             <h3>Как это работает?</h3>
-            <p>Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>.</p>
+            <p>Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>. С интуицией, стоящей за сингулярным разложением, рекомендую ознакомиться в видео:</p>
+            <div class="video-container">
+                <iframe width="100%" height="315" src="https://www.youtube.com/embed/vSczTbgc8Rc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <h4 class="compression-title">Сжатие изображения</h4>
             <p>Процесс сжатия изображения с помощью SVD включает следующие шаги:</p>
             <ol>
                 <li>Изображение представляется в виде матрицы для каждого цветового канала (R, G, B).</li>
@@ -458,7 +462,9 @@
                 compressedImage: 'Сжатое изображение',
                 svdMatrices: 'Матрицы SVD разложения',
                 howItWorks: 'Как это работает?',
-                theory: 'Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>.',
+                theory: 'Сингулярное разложение (SVD) - это метод факторизации матрицы, который позволяет представить изображение в виде произведения трех матриц: U, Σ и V<sup>T</sup>. Подробнее об интуиции, стоящей за сингулярным разложением, рекомендую ознакомиться в видео:',
+                imageCompression: 'Сжатие изображения',
+                stepsIntro: 'Процесс сжатия изображения с помощью SVD включает следующие шаги:',
                 steps: [
                     'Изображение представляется в виде матрицы для каждого цветового канала (R, G, B).',
                     'Для каждой матрицы вычисляется SVD разложение: A = U × Σ × V<sup>T</sup>',
@@ -479,7 +485,8 @@
                     compression: 'Ошибка при сжатии',
                     processing: 'Ошибка при обработке изображения',
                     updating: 'Ошибка при обновлении изображения'
-                }
+                },
+                authorName: 'Иван Антипов'
             },
             en: {
                 pageTitle: 'Singular Value Decomposition for Image Compression',
@@ -490,7 +497,9 @@
                 compressedImage: 'Compressed Image',
                 svdMatrices: 'SVD Decomposition Matrices',
                 howItWorks: 'How It Works?',
-                theory: 'Singular Value Decomposition (SVD) is a matrix factorization method that allows representing an image as a product of three matrices: U, Σ, and V<sup>T</sup>.',
+                theory: 'Singular Value Decomposition (SVD) is a matrix factorization method that allows representing an image as a product of three matrices: U, Σ, and V<sup>T</sup>. For more details about the intuition behind singular value decomposition, I recommend watching this video:',
+                imageCompression: 'Image Compression',
+                stepsIntro: 'The image compression process using SVD includes the following steps:',
                 steps: [
                     'The image is represented as a matrix for each color channel (R, G, B).',
                     'SVD decomposition is calculated for each matrix: A = U × Σ × V<sup>T</sup>',
@@ -511,7 +520,8 @@
                     compression: 'Compression error',
                     processing: 'Error processing image',
                     updating: 'Error updating image'
-                }
+                },
+                authorName: 'Ivan Antipov'
             }
         };
 
@@ -545,19 +555,45 @@
             
             const theoryBlock = document.querySelector('.theory-block');
             theoryBlock.querySelector('h3').textContent = t.howItWorks;
-            theoryBlock.querySelector('p').innerHTML = t.theory;
+            
+            const firstP = theoryBlock.querySelector('p');
+            firstP.innerHTML = t.theory;
+            
+            let videoContainer = theoryBlock.querySelector('.video-container');
+            if (!videoContainer) {
+                videoContainer = document.createElement('div');
+                videoContainer.className = 'video-container';
+                videoContainer.style.margin = '20px 0';
+                videoContainer.innerHTML = '<iframe width="100%" height="315" src="https://www.youtube.com/embed/vSczTbgc8Rc" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                firstP.after(videoContainer);
+            }
+            
+            let compressionTitle = theoryBlock.querySelector('.compression-title');
+            if (!compressionTitle) {
+                compressionTitle = document.createElement('h4');
+                compressionTitle.className = 'compression-title';
+                compressionTitle.style.color = '#1a237e';
+                compressionTitle.style.marginTop = '30px';
+                videoContainer.after(compressionTitle);
+            }
+            compressionTitle.textContent = t.imageCompression;
+            
+            theoryBlock.querySelectorAll('p')[1].textContent = t.stepsIntro;
             
             const steps = theoryBlock.querySelectorAll('ol li');
             steps.forEach((step, index) => {
                 step.innerHTML = t.steps[index];
             });
             
-            theoryBlock.querySelectorAll('p')[1].textContent = t.effectiveFor;
+            theoryBlock.querySelectorAll('p')[2].textContent = t.effectiveFor;
             
             const value = document.getElementById('singularValues').value;
             const max = document.getElementById('singularValues').max;
             document.getElementById('singularValuesDisplay').textContent = 
                 `${value} ${t.componentsOf} ${max}`;
+            
+            const authorLink = document.querySelector('.author-link');
+            authorLink.innerHTML = `${t.authorName} (<a href="https://t.me/ai_about_ai" target="_blank">@ai_about_ai</a>)`;
         }
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -569,9 +605,10 @@
             
             function updateSliderMax(width, height) {
                 const maxComponents = Math.min(50, Math.min(width, height));
+                const t = translations[currentLanguage];
                 singularValuesInput.max = maxComponents;
                 singularValuesInput.value = 1;
-                singularValuesDisplay.textContent = `1 из ${maxComponents}`;
+                singularValuesDisplay.textContent = `1 ${t.componentsOf} ${maxComponents}`;
                 console.log(`Максимальное количество компонент: ${maxComponents}`);
             }
             
@@ -595,13 +632,13 @@
                 }
                 
                 if (svdResults.R.V.length > 0) {
-                compressTimeout = setTimeout(() => {
-                    const img = document.getElementById('originalImage');
-                    if (img.src) {
+                    compressTimeout = setTimeout(() => {
+                        const img = document.getElementById('originalImage');
+                        if (img.src) {
                             updateCompressedImage(value);
                         }
                     }, 100);
-                    }
+                }
             });
         });
 
@@ -878,9 +915,10 @@
                         const currentK = i + 1;
                         const singularValuesInput = document.getElementById('singularValues');
                         const singularValuesDisplay = document.getElementById('singularValuesDisplay');
-                        
+                        const t = translations[currentLanguage];
+
                         singularValuesInput.value = currentK;
-                        singularValuesDisplay.textContent = `${currentK} из ${maxK}`;
+                        singularValuesDisplay.textContent = `${currentK} ${t.componentsOf} ${maxK}`;
                         
                         await updateCompressedImage(currentK);
                         
